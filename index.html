@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Title</title>
-    <script src="node_modules/jquery/dist/jquery.js"></script>
-
-    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/3.0.13/svg.min.js"></script>-->
 
 
     <style>
@@ -34,8 +31,20 @@
             font-size: 12px;
         }
 
-        .name, .title {
-            background-color: orange;
+        #community-people .name, #community-people .title {
+            background-color: #f9a32c;
+            color: white;
+            padding: 5px;
+        }
+
+        #district-people .name, #district-people .title {
+            background-color: #5579bb;
+            color: white;
+            padding: 5px;
+        }
+
+        #national-people .name, #national-people .title {
+            background-color: #ec4049;
             color: white;
             padding: 5px;
         }
@@ -106,43 +115,18 @@
         }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="/grid/simple-grid.css"/>
+
+
+    <!--<script src="node_modules/jquery/dist/jquery.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/3.0.13/svg.min.js"></script>-->
+
+    <script
+            src="https://code.jquery.com/jquery-2.2.4.min.js"
+            integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+            crossorigin="anonymous"></script>
 
     <script>
         $(function () {
-            /*$("img").on("mouseover", function () {
-                console.log(this);
-                $(this).removeClass("shrink");
-                $(this).addClass("large");
-            });
-            $("img").on("mouseout", function () {
-                console.log(this);
-                $(this).removeClass("large");
-                $(this).addClass("shrink");
-            })*/
-
-
-            //So when the top of an element touches the bottom of the window, that is 0% (0)
-            //When the bottom of the graphic leaves the top of the screen, that is 100% (1)
-
-            /*
-            setInterval(function () {
-
-            }, 500);
-
-            var personBoxes = $(".person-box").toArray();
-
-            personBoxes.forEach(function (box, index, array) {
-                array[index] = {
-                    $el: $(box),
-                    offsetTop: $(box).offset().top,
-                    height: $(box).height(),
-                    index: index
-                };
-            });
-
-            var windowHeight = $(window).height();
-            */
 
 
             var animateBetween = function (start, end, percent) {
@@ -201,9 +185,10 @@
 
             var animatePeople = function (percent, selector) {
                 var scale = 1 + (0.5 * percent);
-                $(selector + " img").css('transform', 'scale(' + scale + ')')
-                $(".name-and-title-box").css({opacity: 1.5 * percent});
+                $(selector + " img").css('transform', 'scale(' + scale + ')');
+                $(selector + " .name-and-title-box").css({opacity: 1.5 * percent});
             };
+
 
 
             var animatedElements = [
@@ -221,6 +206,18 @@
                 },
                 {
                     selector: "#community-people",
+                    animate: animatePeople,
+                    startPercent: 0.20,
+                    endPercent: 0.80
+                },
+                {
+                    selector: "#district-people",
+                    animate: animatePeople,
+                    startPercent: 0.20,
+                    endPercent: 0.80
+                },
+                {
+                    selector: "#national-people",
                     animate: animatePeople,
                     startPercent: 0.20,
                     endPercent: 0.80
@@ -267,25 +264,8 @@
                 });
             });
 
-            //console.log(personBoxes, scrollPos);
-            /*
-            personBoxes.forEach(function (box) {
-                if (scrollPos + box.height > box.offsetTop) {
-                    if (scrollPos + box.height + (windowHeight * 0.2) < box.offsetTop + windowHeight) {
-                        box.$el.removeClass("shrink");
-                        box.$el.addClass("large");
-                        return console.log(box.index);
-                    }
-                }
-                box.$el.removeClass("large");
-                box.$el.addClass("shrink");
-            })*/
-
-
-            //window.personBoxes = personBoxes;
+            console.log("here");
         });
-
-
     </script>
 
 </head>
@@ -348,14 +328,216 @@
         </div>
     </div>
 
-    <div id="characters">
+    <style>
+        .container {
+            width: 90%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .row {
+            position: relative;
+            width: 100%;
+        }
+
+        .row [class^="col"] {
+            float: left;
+            margin: 0.5rem 2%;
+            min-height: 0.125rem;
+        }
+
+        .col-1,
+        .col-2,
+        .col-3,
+        .col-4,
+        .col-5,
+        .col-6,
+        .col-7,
+        .col-8,
+        .col-9,
+        .col-10,
+        .col-11,
+        .col-12 {
+            width: 96%;
+        }
+
+        .col-1-sm {
+            width: 4.33%;
+        }
+
+        .col-2-sm {
+            width: 12.66%;
+        }
+
+        .col-3-sm {
+            width: 21%;
+        }
+
+        .col-4-sm {
+            width: 29.33%;
+        }
+
+        .col-5-sm {
+            width: 37.66%;
+        }
+
+        .col-6-sm {
+            width: 46%;
+        }
+
+        .col-7-sm {
+            width: 54.33%;
+        }
+
+        .col-8-sm {
+            width: 62.66%;
+        }
+
+        .col-9-sm {
+            width: 71%;
+        }
+
+        .col-10-sm {
+            width: 79.33%;
+        }
+
+        .col-11-sm {
+            width: 87.66%;
+        }
+
+        .col-12-sm {
+            width: 96%;
+        }
+
+        .row::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        .hidden-sm {
+            display: none;
+        }
+
+        @media only screen and (min-width: 33.75em) {
+            /* 540px */
+            .container {
+                width: 80%;
+            }
+        }
+
+        @media only screen and (min-width: 45em) {
+            /* 720px */
+            .col-1 {
+                width: 4.33%;
+            }
+
+            .col-2 {
+                width: 12.66%;
+            }
+
+            .col-3 {
+                width: 21%;
+            }
+
+            .col-4 {
+                width: 29.33%;
+            }
+
+            .col-5 {
+                width: 37.66%;
+            }
+
+            .col-6 {
+                width: 46%;
+            }
+
+            .col-7 {
+                width: 54.33%;
+            }
+
+            .col-8 {
+                width: 62.66%;
+            }
+
+            .col-9 {
+                width: 71%;
+            }
+
+            .col-10 {
+                width: 79.33%;
+            }
+
+            .col-11 {
+                width: 87.66%;
+            }
+
+            .col-12 {
+                width: 96%;
+            }
+
+            .hidden-sm {
+                display: block;
+            }
+        }
+
+        @media only screen and (min-width: 60em) {
+            /* 960px */
+            .container {
+                width: 75%;
+                max-width: 60rem;
+            }
+        }
+
+
+        .name-and-title-box {
+            position: absolute;
+            bottom: -20px;
+            right: -100px;
+            font-size: 12px;
+        }
+
+        .name, .title {
+            background-color: orange;
+            color: white;
+            padding: 5px;
+        }
+
+        .frame {
+            height: 100%;
+            width: 160px;
+            white-space: nowrap;
+            margin: 1em 0;
+            position: relative;
+        }
+
+        .helper {
+            display: inline-block;
+            height: 100%;
+            vertical-align: middle;
+        }
+
+        .frame img {
+            /*background: #3A6F9A;*/
+            vertical-align: middle;
+            max-height: 100%;
+            max-width: 100%;
+            width: 100%;
+            height: 100%;
+        }
+
+        .left-text {
+            font-size: 14px;
+        }
+
+    </style>
+
+    <div class="container" id="characters">
         <div id="community-people">
-
-
             <div>Community</div>
             <hr>
             <div class="row">
-                <div class="col-5">
+                <div class="col-5 left-text">
                     Mauris auctor id elit vitae tincidunt. Mauris ut turpis iaculis, ullamcorper lacus quis, porta
                     lacus.
                     Quisque viverra massa sed nisi ultricies sollicitudin. In neque mauris, congue ac erat et, blandit
@@ -373,7 +555,8 @@
                             <div class="frame person-box">
 
                                 <span class="helper"></span>
-                                <img src="assets/people/people_Awoonor-Williams.png">
+                                <img alt="0"
+                                     src="https://raw.githubusercontent.com/makemore/fatrat-who/master/assets/people/people_Awoonor-Williams.png">
                                 <div class="name-and-title-box">
                                     <span class="name">Elisabeth</span>
                                     <div class="title">Community Health Volunteer</div>
@@ -383,7 +566,8 @@
                         <div class="col-6-sm">
                             <div class="frame person-box">
                                 <span class="helper"></span>
-                                <img src="assets/people/people_Awoonor-Williams.png">
+                                <img alt="1"
+                                     src="https://raw.githubusercontent.com/makemore/fatrat-who/master/assets/people/people_Awoonor-Williams.png">
                                 <div class="name-and-title-box">
                                     <span class="name">Elisabeth</span>
                                     <div class="title">Community Health Volunteer</div>
@@ -396,12 +580,10 @@
             </div>
         </div>
         <div id="district-people">
-
-
             <div>District</div>
             <hr>
             <div class="row">
-                <div class="col-6">
+                <div class="col-5 left-text">
                     Mauris auctor id elit vitae tincidunt. Mauris ut turpis iaculis, ullamcorper lacus quis, porta
                     lacus.
                     Quisque viverra massa sed nisi ultricies sollicitudin. In neque mauris, congue ac erat et, blandit
@@ -413,26 +595,29 @@
                     eu
                     felis.
                 </div>
-                <div class="col-6">
+                <div class="col-7">
                     <div class="row">
-                        <div class="col-6">
+                        <div class="col-6-sm">
                             <div class="frame person-box">
+
+                                <span class="helper"></span>
+                                <img alt="2"
+                                     src="https://raw.githubusercontent.com/makemore/fatrat-who/master/assets/people/people_Awoonor-Williams.png">
                                 <div class="name-and-title-box">
                                     <span class="name">Elisabeth</span>
                                     <div class="title">Community Health Volunteer</div>
                                 </div>
-                                <span class="helper"></span>
-                                <img src="assets/people/people_Awoonor-Williams.png">
                             </div>
                         </div>
-                        <div class="col-6">
+                        <div class="col-6-sm">
                             <div class="frame person-box">
+                                <span class="helper"></span>
+                                <img alt="3"
+                                     src="https://raw.githubusercontent.com/makemore/fatrat-who/master/assets/people/people_Awoonor-Williams.png">
                                 <div class="name-and-title-box">
                                     <span class="name">Elisabeth</span>
                                     <div class="title">Community Health Volunteer</div>
                                 </div>
-                                <span class="helper"></span>
-                                <img src="assets/people/people_Awoonor-Williams.png">
                             </div>
                         </div>
                     </div>
@@ -444,7 +629,7 @@
             <div>National</div>
             <hr>
             <div class="row">
-                <div class="col-6">
+                <div class="col-5 left-text">
                     Mauris auctor id elit vitae tincidunt. Mauris ut turpis iaculis, ullamcorper lacus quis, porta
                     lacus.
                     Quisque viverra massa sed nisi ultricies sollicitudin. In neque mauris, congue ac erat et, blandit
@@ -456,26 +641,29 @@
                     eu
                     felis.
                 </div>
-                <div class="col-6">
+                <div class="col-7">
                     <div class="row">
-                        <div class="col-6">
+                        <div class="col-6-sm">
                             <div class="frame person-box">
+
+                                <span class="helper"></span>
+                                <img alt="5"
+                                     src="https://raw.githubusercontent.com/makemore/fatrat-who/master/assets/people/people_Awoonor-Williams.png">
                                 <div class="name-and-title-box">
                                     <span class="name">Elisabeth</span>
                                     <div class="title">Community Health Volunteer</div>
                                 </div>
-                                <span class="helper"></span>
-                                <img src="assets/people/people_Awoonor-Williams.png">
                             </div>
                         </div>
-                        <div class="col-6">
+                        <div class="col-6-sm">
                             <div class="frame person-box">
+                                <span class="helper"></span>
+                                <img alt="6"
+                                     src="https://raw.githubusercontent.com/makemore/fatrat-who/master/assets/people/people_Awoonor-Williams.png">
                                 <div class="name-and-title-box">
                                     <span class="name">Elisabeth</span>
                                     <div class="title">Community Health Volunteer</div>
                                 </div>
-                                <span class="helper"></span>
-                                <img src="assets/people/people_Awoonor-Williams.png">
                             </div>
                         </div>
                     </div>
