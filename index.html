@@ -4,11 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Title</title>
-    <script
-            src="https://code.jquery.com/jquery-3.4.1.min.js"
-            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
-            crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/3.0.13/svg.min.js"></script>
+    <script src="node_modules/jquery/dist/jquery.js"></script>
+
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/3.0.13/svg.min.js"></script>-->
 
 
     <style>
@@ -31,8 +29,8 @@
 
         .name-and-title-box {
             position: absolute;
-            right: -50px;
-            bottom: 20px;
+            bottom: -20px;
+            right: -100px;
             font-size: 12px;
         }
 
@@ -41,6 +39,30 @@
             color: white;
             padding: 5px;
         }
+
+        .frame {
+            height: 100%; /* Equals maximum image height */
+            width: 160px;
+            /*border: 1px solid red;*/
+            white-space: nowrap; /* This is required unless you put the helper span closely near the img */
+            /*text-align: center;*/
+            margin: 1em 0;
+            position: relative;
+        }
+
+        .helper {
+            display: inline-block;
+            height: 100%;
+            vertical-align: middle;
+        }
+
+        .frame img {
+            /*background: #3A6F9A;*/
+            vertical-align: middle;
+            max-height: 100%;
+            max-width: 100%;
+        }
+
 
         .name {
 
@@ -99,6 +121,15 @@
                 $(this).addClass("shrink");
             })*/
 
+
+            //So when the top of an element touches the bottom of the window, that is 0% (0)
+            //When the bottom of the graphic leaves the top of the screen, that is 100% (1)
+
+            /*
+            setInterval(function () {
+
+            }, 500);
+
             var personBoxes = $(".person-box").toArray();
 
             personBoxes.forEach(function (box, index, array) {
@@ -111,20 +142,12 @@
             });
 
             var windowHeight = $(window).height();
-
-            var synringe = $("#filled_in_bit");
-            var syringeOffsetTop = $("#syringe").offset().top;
-            var syringeHeight = $("#syringe").height();
-
-
-            var graphOffsetTop = $("#graph").offset().top;
-            var graphHeight = $("#graph").height();
+            */
 
 
             var animateBetween = function (start, end, percent) {
                 var difference = start - end;
                 var output = start - (difference * percent);
-                console.log("output", output);
                 return output;
             };
 
@@ -135,28 +158,36 @@
 
             $("#polyline").attr("points", "194.5,677.7 322.5,677.7 458.5,677.7 593,677.7");
 
-            $(window).scroll(function () {
-                var scrollPos = $(document).scrollTop();
+            var synringe = $("#filled_in_bit");
 
-                if (scrollPos < graphOffsetTop) {
-                    percentGonePast = 0;
+            var animateSyringe = function (percent) {
+                //console.log("syringe", percent);
+                var potentialHeight = 86.1 * percent;
+                if (potentialHeight > 86.1) {
+                    potentialHeight = 86.1;
                 }
-                if (scrollPos > graphOffsetTop) {
-                    //console.log("graph should animate now");
-                    var gonePastBy = Math.abs(graphOffsetTop - scrollPos);
-                    var percentGonePast = gonePastBy / graphHeight;
-                    //console.log("graph", percentGonePast);
+                synringe.height(potentialHeight);
 
-                    percentGonePast = percentGonePast * 12;
-                    if (percentGonePast > 1) {
-                        percentGonePast = 1;
-                    }
+                var textPercent = parseInt(83 * percent);
+
+                if (textPercent > 83) {
+                    textPercent = 83;
+                }
+                $("#percentIncrese").text(textPercent + "%");
+                //console.log("we've gone past the synringe, start animating");
+            };
+
+            var animatedGraph = function (percent) {
+                percent = percent;
+
+                if (percent > 1) {
+                    percent = 1;
                 }
 
-                var cir1Y = animateBetween(677.4, 677.4, percentGonePast);
-                var cir2Y = animateBetween(677.4, 603.7, percentGonePast);
-                var cir3Y = animateBetween(677.4, 429.7, percentGonePast);
-                var cir4Y = animateBetween(677.4, 201.2, percentGonePast);
+                var cir1Y = animateBetween(677.4, 677.4, percent);
+                var cir2Y = animateBetween(677.4, 603.7, percent);
+                var cir3Y = animateBetween(677.4, 429.7, percent);
+                var cir4Y = animateBetween(677.4, 201.2, percent);
 
                 $("#circle1").attr("cy", cir1Y);
                 $("#circle2").attr("cy", cir2Y);
@@ -165,37 +196,93 @@
                 //<polyline id="polyline" class="st4" points="194.5,677.7 322.5,603.7 458.5,429.7 593,200.7 	"/>
 
                 $("#polyline").attr("points", "194.5," + cir1Y + " 322.5," + cir2Y + " 458.5," + cir3Y + " 593," + cir4Y);
+            };
 
 
-                if (scrollPos > syringeOffsetTop) {
-                    var gonePastBy = Math.abs(syringeOffsetTop - scrollPos);
-                    var percentGonePast = gonePastBy / syringeHeight;
-                    console.log(percentGonePast);
-                    //console.log(100 * )
-                    var potentialHeight = 86.1 * percentGonePast * 4;
-                    if (potentialHeight > 86.1) {
-                        potentialHeight = 86.1;
-                    }
-                    synringe.height(potentialHeight);
-                    console.log("we've gone past the synringe, start animating");
+            var animatePeople = function (percent, selector) {
+                var scale = 1 + (0.5 * percent);
+                $(selector + " img").css('transform', 'scale(' + scale + ')')
+                $(".name-and-title-box").css({opacity: 1.5 * percent});
+            };
+
+
+            var animatedElements = [
+                {
+                    selector: "#syringe",
+                    animate: animateSyringe,
+                    startPercent: 0.25,
+                    endPercent: 0.60
+                },
+                {
+                    selector: "#graph",
+                    animate: animatedGraph,
+                    startPercent: 0.10,
+                    endPercent: 0.60
+                },
+                {
+                    selector: "#community-people",
+                    animate: animatePeople,
+                    startPercent: 0.20,
+                    endPercent: 0.80
                 }
+            ];
 
-
-                //console.log(personBoxes, scrollPos);
-                personBoxes.forEach(function (box) {
-                    if (scrollPos + box.height > box.offsetTop) {
-                        if (scrollPos + box.height + (windowHeight * 0.2) < box.offsetTop + windowHeight) {
-                            box.$el.removeClass("shrink");
-                            box.$el.addClass("large");
-                            return console.log(box.index);
+            $(window).scroll(function () {
+                animatedElements.forEach(function (element) {
+                    var clientRect = document.querySelector(element.selector).getBoundingClientRect();
+                    var innerHeight = window.innerHeight;
+                    var percentThroughScroll;
+                    if (clientRect.y < innerHeight) {
+                        if (clientRect.y < 0 - clientRect.height) {
+                            percentThroughScroll = 1;
+                        } else {
+                            var lengthOfScroll = innerHeight + clientRect.height;
+                            var positionInScroll = clientRect.top + clientRect.height;
+                            percentThroughScroll = (lengthOfScroll - positionInScroll) / lengthOfScroll;
                         }
+                    } else {
+                        percentThroughScroll = 0;
                     }
-                    box.$el.removeClass("large");
-                    box.$el.addClass("shrink");
-                })
+                    //console.log(percentThroughScroll);
+
+
+                    if (typeof (element.startPercent) != "undefined" && typeof (element.endPercent) != "undefined") {
+                        var speedUpPercentBy = 1 / (element.endPercent - element.startPercent);
+                        percentThroughScroll = percentThroughScroll * speedUpPercentBy;
+
+                        if (percentThroughScroll < element.startPercent) {
+                            element.animate(0, element.selector);
+                            //console.log("set 0");
+                        } else if (percentThroughScroll > 1 + element.startPercent) {
+                            element.animate(1, element.selector);
+                            //console.log("set 1");
+                        } else {
+                            var modifiedPercent = percentThroughScroll - element.startPercent;
+                            element.animate(modifiedPercent, element.selector);
+                            //console.log("set modified percent");
+                        }
+                    } else {
+                        element.animate(percentThroughScroll, element.selector);
+                    }
+                });
             });
 
-            window.personBoxes = personBoxes;
+            //console.log(personBoxes, scrollPos);
+            /*
+            personBoxes.forEach(function (box) {
+                if (scrollPos + box.height > box.offsetTop) {
+                    if (scrollPos + box.height + (windowHeight * 0.2) < box.offsetTop + windowHeight) {
+                        box.$el.removeClass("shrink");
+                        box.$el.addClass("large");
+                        return console.log(box.index);
+                    }
+                }
+                box.$el.removeClass("large");
+                box.$el.addClass("shrink");
+            })*/
+
+
+            //window.personBoxes = personBoxes;
         });
 
 
@@ -261,29 +348,222 @@
         </div>
     </div>
 
+    <div id="characters">
+        <div id="community-people">
+
+
+            <div>Community</div>
+            <hr>
+            <div class="row">
+                <div class="col-5">
+                    Mauris auctor id elit vitae tincidunt. Mauris ut turpis iaculis, ullamcorper lacus quis, porta
+                    lacus.
+                    Quisque viverra massa sed nisi ultricies sollicitudin. In neque mauris, congue ac erat et, blandit
+                    luctus
+                    lorem. Fusce aliquam libero vel sem consectetur euismod. Suspendisse volutpat enim ac purus gravida
+                    cursus.
+                    Donec fermentum, sapien vel convallis sollicitudin, turpis leo ullamcorper arcu, id convallis risus
+                    erat
+                    eu
+                    felis.
+                </div>
+                <div class="col-7">
+                    <div class="row">
+                        <div class="col-6-sm">
+                            <div class="frame person-box">
+
+                                <span class="helper"></span>
+                                <img src="assets/people/people_Awoonor-Williams.png">
+                                <div class="name-and-title-box">
+                                    <span class="name">Elisabeth</span>
+                                    <div class="title">Community Health Volunteer</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6-sm">
+                            <div class="frame person-box">
+                                <span class="helper"></span>
+                                <img src="assets/people/people_Awoonor-Williams.png">
+                                <div class="name-and-title-box">
+                                    <span class="name">Elisabeth</span>
+                                    <div class="title">Community Health Volunteer</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div id="district-people">
+
+
+            <div>District</div>
+            <hr>
+            <div class="row">
+                <div class="col-6">
+                    Mauris auctor id elit vitae tincidunt. Mauris ut turpis iaculis, ullamcorper lacus quis, porta
+                    lacus.
+                    Quisque viverra massa sed nisi ultricies sollicitudin. In neque mauris, congue ac erat et, blandit
+                    luctus
+                    lorem. Fusce aliquam libero vel sem consectetur euismod. Suspendisse volutpat enim ac purus gravida
+                    cursus.
+                    Donec fermentum, sapien vel convallis sollicitudin, turpis leo ullamcorper arcu, id convallis risus
+                    erat
+                    eu
+                    felis.
+                </div>
+                <div class="col-6">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="frame person-box">
+                                <div class="name-and-title-box">
+                                    <span class="name">Elisabeth</span>
+                                    <div class="title">Community Health Volunteer</div>
+                                </div>
+                                <span class="helper"></span>
+                                <img src="assets/people/people_Awoonor-Williams.png">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="frame person-box">
+                                <div class="name-and-title-box">
+                                    <span class="name">Elisabeth</span>
+                                    <div class="title">Community Health Volunteer</div>
+                                </div>
+                                <span class="helper"></span>
+                                <img src="assets/people/people_Awoonor-Williams.png">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div id="national-people">
+            <div>National</div>
+            <hr>
+            <div class="row">
+                <div class="col-6">
+                    Mauris auctor id elit vitae tincidunt. Mauris ut turpis iaculis, ullamcorper lacus quis, porta
+                    lacus.
+                    Quisque viverra massa sed nisi ultricies sollicitudin. In neque mauris, congue ac erat et, blandit
+                    luctus
+                    lorem. Fusce aliquam libero vel sem consectetur euismod. Suspendisse volutpat enim ac purus gravida
+                    cursus.
+                    Donec fermentum, sapien vel convallis sollicitudin, turpis leo ullamcorper arcu, id convallis risus
+                    erat
+                    eu
+                    felis.
+                </div>
+                <div class="col-6">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="frame person-box">
+                                <div class="name-and-title-box">
+                                    <span class="name">Elisabeth</span>
+                                    <div class="title">Community Health Volunteer</div>
+                                </div>
+                                <span class="helper"></span>
+                                <img src="assets/people/people_Awoonor-Williams.png">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="frame person-box">
+                                <div class="name-and-title-box">
+                                    <span class="name">Elisabeth</span>
+                                    <div class="title">Community Health Volunteer</div>
+                                </div>
+                                <span class="helper"></span>
+                                <img src="assets/people/people_Awoonor-Williams.png">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-12">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas nisl tellus, posuere eget enim sit amet,
+            ultrices iaculis odio. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin sagittis aliquam risus
+            eget molestie. Proin id velit nunc. Praesent sit amet felis ac nisl luctus sagittis. Cras nulla tortor,
+            ultrices sodales gravida non, feugiat nec urna. Duis viverra sagittis sapien, commodo pellentesque lectus
+            congue ut. Curabitur sollicitudin, turpis eget sagittis pharetra, quam massa tristique elit, non accumsan
+            nisl metus non ligula.<br><br>
+
+            Suspendisse in ullamcorper ipsum. Praesent et ultricies sem. Cras vulputate volutpat venenatis. Nullam vitae
+            nibh eu nisl rhoncus ullamcorper. Phasellus lectus leo, molestie eget ligula et, commodo viverra nisl. Etiam
+            non nibh neque. Integer fringilla a tortor in egestas. In hac habitasse platea dictumst. Duis augue risus,
+            bibendum non dui ut, tristique faucibus justo. Vivamus magna velit, lacinia at magna sit amet, varius
+            vestibulum diam. Vivamus est ligula, condimentum id ipsum ac, pretium interdum sem. Nunc pretium finibus
+            aliquet. Quisque vel condimentum sapien. Mauris dolor leo, viverra et est pretium, cursus lacinia mauris.
+            Nam nulla libero, vulputate a turpis eget, elementum suscipit ex.<br><br>
+
+            Sed lobortis felis non ipsum accumsan pretium. Pellentesque in maximus orci. Maecenas in lorem lacinia,
+            ultrices erat aliquet, malesuada mauris. Curabitur at tellus non libero convallis maximus. In tristique eget
+            lacus ac luctus. Praesent mattis elit facilisis lorem suscipit, id venenatis nulla sagittis. Ut efficitur
+            tortor a ultricies ullamcorper. Vestibulum blandit pretium aliquet. Nunc laoreet mi leo, eu suscipit neque
+            elementum in. Fusce vulputate et sapien porta rutrum. Curabitur enim tortor, scelerisque sit amet tincidunt
+            in, accumsan id dolor. Sed nec lorem felis. Proin dolor eros, varius vel viverra vitae, luctus id lacus.<br><br>
+
+            Vestibulum auctor dui sit amet justo egestas lobortis. Maecenas quis egestas mi. In hac habitasse platea
+            dictumst. Nam at tempor felis. Etiam diam neque, rutrum tempor vestibulum eget, tincidunt nec turpis. Etiam
+            euismod accumsan nunc vel commodo. Phasellus dui ipsum, fermentum vel elit a, luctus facilisis elit. Proin
+            laoreet semper consectetur. Morbi sem neque, dignissim varius egestas vel, dapibus sit amet sapien.<br><br>
+
+            Integer mollis, sem in fringilla congue, eros libero fringilla diam, nec pellentesque nibh ligula sed
+            turpis. Vestibulum blandit eget lectus ornare vulputate. Etiam non hendrerit nisi. Proin tincidunt dui id
+            lectus maximus, ac volutpat nibh mollis. Nunc et ultrices massa. Ut sit amet risus nunc. Cras in sapien ac
+            lacus condimentum venenatis eget ut augue. Maecenas porta, diam nec porta pretium, velit nunc laoreet
+            lectus, ac tristique tellus dui nec nisi. In facilisis imperdiet mauris. Aliquam eu nisi quis justo
+            imperdiet consequat quis vitae elit. In purus ipsum, venenatis non dignissim et, efficitur id ipsum. Vivamus
+            augue eros, porttitor eu elit in, lacinia congue nibh.<br><br>
+
+            Fusce pellentesque porta sem non rutrum. Mauris suscipit venenatis nibh id eleifend. Nulla mattis egestas
+            risus, sit amet lacinia lorem semper ut. Donec quis volutpat ex. Aliquam vestibulum convallis ligula eu
+            dictum. Curabitur a tempor metus, sit amet ultrices mi. Mauris eu diam eget nisl ultrices posuere.
+            Pellentesque sollicitudin consequat ex non malesuada. Orci varius natoque penatibus et magnis dis parturient
+            montes, nascetur ridiculus mus. Aliquam est nisl, lobortis sit amet velit vel, sodales lobortis
+            neque.<br><br>
+
+            Mauris auctor id elit vitae tincidunt. Mauris ut turpis iaculis, ullamcorper lacus quis, porta lacus.
+            Quisque viverra massa sed nisi ultricies sollicitudin. In neque mauris, congue ac erat et, blandit luctus
+            lorem. Fusce aliquam libero vel sem consectetur euismod. Suspendisse volutpat enim ac purus gravida cursus.
+            Donec fermentum, sapien vel convallis sollicitudin, turpis leo ullamcorper arcu, id convallis risus erat eu
+            felis. Mauris tempus sem ac nibh feugiat tristique. Nam et convallis metus, sit amet porttitor ex.
+            Pellentesque faucibus orci quis enim convallis ultricies. Vivamus a malesuada mi, sed blandit diam.
+            Suspendisse lobortis finibus leo in tristique. Sed eu tortor lacus. Aliquam erat volutpat. Donec nisl justo,
+            blandit at tellus quis, venenatis fringilla tortor. Suspendisse a ullamcorper nisi.<br><br>
+        </div>
+    </div>
+
     <div id="graph">
         <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-             viewBox="0 0 794 870.1" style="enable-background:new 0 0 794 870.1;" xml:space="preserve">
+             viewBox="0 0 794 870.1" style="width:50%;enable-background:new 0 0 794 870.1;" xml:space="preserve">
 <style type="text/css">
-	.st0 {
+	#graph .st0 {
         fill: none;
         stroke: #3A3A3A;
         stroke-miterlimit: 10;
     }
 
-    .st1 {
+    #graph .st1 {
         fill: #2D2D2D;
     }
 
-    .st2 {
+    #graph .st2 {
         fill: #F9A42B;
     }
 
-    .st3 {
+    #graph .st3 {
         fill: #FFFFFF;
     }
 
-    .st4 {
+    #graph .st4 {
         fill: none;
         stroke: #F9A42B;
         stroke-width: 3;
@@ -681,11 +961,12 @@
         </div>
     </div>
 
-    <div id="syringe">
+    <div id="syringe" style="border:1px solid black">
 
         <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-             x="0px" y="0px"
-             viewBox="0 0 151 214" style="enable-background:new 0 0 151 214;" xml:space="preserve">
+             x="0px"
+             y="0px"
+             viewBox="0 0 454.2 214" style="enable-background:new 0 0 454.2 214;" xml:space="preserve">
 <style type="text/css">
 	#syringe .st0 {
         fill: #FFA52A;
@@ -700,6 +981,14 @@
     }
 
     #syringe .st3 {
+        font-family: 'Arial-BoldMT';
+    }
+
+    #syringe .st4 {
+        font-size: 5.9312px;
+    }
+
+    #syringe .st5 {
         fill: none;
         stroke: #3A3A3A;
         stroke-width: 3;
@@ -708,7 +997,7 @@
         stroke-miterlimit: 10;
     }
 
-    #syringe .st4 {
+    #syringe .st6 {
         fill: none;
         stroke: #3A3A3A;
         stroke-width: 2;
@@ -717,79 +1006,68 @@
         stroke-miterlimit: 10;
     }
 
-    #syringe .st5 {
+    #syringe .st7 {
         fill: none;
         stroke: #3A3A3A;
         stroke-width: 1.5;
         stroke-linecap: round;
         stroke-miterlimit: 10;
     }
+
+    #syringe .st8 {
+        fill: none;
+    }
+
+    #syringe .st9 {
+        font-family: 'ArialMT';
+    }
+
+    #syringe .st10 {
+        font-size: 24.3763px;
+    }
+
+    #syringe .st11 {
+        fill: #EFEFEF;
+    }
+
+    #syringe .st12 {
+        font-size: 27.5838px;
+    }
 </style>
-
-
             <g>
-	        <!--<rect id="filled_in_bit" x="55.2" y="81.8" class="st0" width="38.3" height="86.1"/>-->
-	        <g transform="scale(1,-1) translate(0,-178.5)">
-                <rect id="filled_in_bit" x="55.2" y="10.8" class="st0" width="38.3" height="10.1"/>
+                <g transform="scale(1,-1) translate(0,-250.5)">
+                <rect id="filled_in_bit" x="358.4" y="81.8" class="st0" width="38.3" height="86.1"/>
             </g>
-                <rect x="55.2" y="151.4" class="st1" width="38.3" height="17.1"/>
+
+                <rect x="358.4" y="151.4" class="st1" width="38.3" height="17.1"/>
+                <text transform="matrix(1 0 0 1 380.1417 84.4819)" class="st2 st3 st4">83%</text>
+                <text transform="matrix(1 0 0 1 380.6417 152.9819)" class="st2 st3 st4">30%</text>
+                <path class="st5" d="M397.8,168.2V69.5c0-6.6-5.8-12-13-12h-12.3c-7.2,0-13,5.4-13,12v98.7H397.8z"/>
+                <line class="st5" x1="404" y1="168.2" x2="353.4" y2="168.2"/>
                 <g>
-		<path class="st2" d="M77.9,82.2c-0.2-0.1-0.4-0.2-0.5-0.4s-0.1-0.3-0.1-0.5c0-0.3,0.1-0.6,0.3-0.8c0.2-0.2,0.5-0.3,0.9-0.3
-			c0.4,0,0.7,0.1,0.9,0.3s0.3,0.5,0.3,0.8c0,0.2-0.1,0.4-0.2,0.5c-0.1,0.2-0.2,0.3-0.4,0.4c0.2,0.1,0.4,0.2,0.5,0.4
-			c0.1,0.2,0.2,0.4,0.2,0.6c0,0.4-0.1,0.7-0.4,1c-0.2,0.2-0.6,0.4-1,0.4c-0.4,0-0.7-0.1-1-0.3c-0.3-0.2-0.5-0.6-0.5-1
-			c0-0.2,0.1-0.4,0.2-0.6C77.5,82.4,77.6,82.3,77.9,82.2z M78,83.2c0,0.2,0.1,0.4,0.2,0.5c0.1,0.1,0.3,0.2,0.4,0.2
-			c0.2,0,0.3-0.1,0.4-0.2c0.1-0.1,0.2-0.3,0.2-0.5c0-0.2-0.1-0.4-0.2-0.5c-0.1-0.1-0.3-0.2-0.4-0.2c-0.2,0-0.3,0.1-0.4,0.2
-			C78,82.9,78,83,78,83.2z M78.1,81.4c0,0.2,0,0.3,0.1,0.4c0.1,0.1,0.2,0.1,0.4,0.1c0.2,0,0.3,0,0.4-0.1s0.1-0.2,0.1-0.4
-			c0-0.2,0-0.3-0.1-0.4s-0.2-0.1-0.4-0.1c-0.2,0-0.3,0-0.4,0.1S78.1,81.2,78.1,81.4z"/>
-                    <path class="st2" d="M80.5,83.4l0.8-0.1c0,0.2,0.1,0.4,0.2,0.5c0.1,0.1,0.2,0.2,0.4,0.2c0.2,0,0.3-0.1,0.4-0.2
-			c0.1-0.1,0.2-0.3,0.2-0.5c0-0.2-0.1-0.4-0.2-0.5c-0.1-0.1-0.2-0.2-0.4-0.2c-0.1,0-0.2,0-0.4,0.1l0.1-0.7c0.2,0,0.4,0,0.5-0.1
-			s0.2-0.2,0.2-0.4c0-0.1,0-0.3-0.1-0.3s-0.2-0.1-0.3-0.1c-0.1,0-0.3,0-0.4,0.1c-0.1,0.1-0.2,0.2-0.2,0.4l-0.8-0.1
-			c0.1-0.3,0.1-0.5,0.2-0.6c0.1-0.2,0.3-0.3,0.4-0.4s0.4-0.1,0.6-0.1c0.4,0,0.7,0.1,1,0.4c0.2,0.2,0.3,0.4,0.3,0.7
-			c0,0.4-0.2,0.7-0.6,0.9c0.2,0.1,0.4,0.2,0.6,0.4s0.2,0.4,0.2,0.7c0,0.4-0.1,0.7-0.4,1c-0.3,0.3-0.6,0.4-1,0.4
-			c-0.4,0-0.7-0.1-1-0.3C80.6,84,80.5,83.7,80.5,83.4z"/>
-                    <path class="st2" d="M83.8,81.3c0-0.4,0.1-0.7,0.2-0.8s0.4-0.3,0.7-0.3c0.3,0,0.5,0.1,0.7,0.3c0.2,0.2,0.3,0.5,0.3,0.8
-			c0,0.4-0.1,0.7-0.3,0.8s-0.4,0.3-0.7,0.3c-0.3,0-0.5-0.1-0.7-0.3C83.9,81.9,83.8,81.7,83.8,81.3z M84.4,81.3c0,0.3,0,0.5,0.1,0.6
-			c0,0.1,0.1,0.1,0.2,0.1c0.1,0,0.2,0,0.2-0.1c0.1-0.1,0.1-0.3,0.1-0.6s0-0.5-0.1-0.6c0-0.1-0.1-0.1-0.2-0.1c-0.1,0-0.2,0-0.2,0.1
-			C84.5,80.8,84.4,81,84.4,81.3z M85.3,84.6h-0.6l2.3-4.5h0.6L85.3,84.6z M86.7,83.5c0-0.4,0.1-0.7,0.2-0.8c0.2-0.2,0.4-0.3,0.7-0.3
-			c0.3,0,0.5,0.1,0.7,0.3c0.2,0.2,0.3,0.5,0.3,0.8c0,0.4-0.1,0.7-0.3,0.8s-0.4,0.3-0.7,0.3c-0.3,0-0.5-0.1-0.7-0.3
-			S86.7,83.9,86.7,83.5z M87.3,83.5c0,0.3,0,0.5,0.1,0.6c0,0.1,0.1,0.1,0.2,0.1c0.1,0,0.2,0,0.2-0.1c0.1-0.1,0.1-0.3,0.1-0.6
-			c0-0.3,0-0.5-0.1-0.6c0-0.1-0.1-0.1-0.2-0.1s-0.2,0-0.2,0.1C87.3,83.1,87.3,83.3,87.3,83.5z"/>
+		<rect x="369.6" y="168.2" class="st5" width="18" height="24.2"/>
+                    <line class="st5" x1="392.5" y1="192.4" x2="365" y2="192.4"/>
 	</g>
                 <g>
-		<path class="st2" d="M77.7,151.9l0.8-0.1c0,0.2,0.1,0.4,0.2,0.5c0.1,0.1,0.2,0.2,0.4,0.2c0.2,0,0.3-0.1,0.4-0.2
-			c0.1-0.1,0.2-0.3,0.2-0.5c0-0.2-0.1-0.4-0.2-0.5c-0.1-0.1-0.2-0.2-0.4-0.2c-0.1,0-0.2,0-0.4,0.1l0.1-0.7c0.2,0,0.4,0,0.5-0.1
-			s0.2-0.2,0.2-0.4c0-0.1,0-0.3-0.1-0.3c-0.1-0.1-0.2-0.1-0.3-0.1c-0.1,0-0.3,0-0.4,0.1c-0.1,0.1-0.2,0.2-0.2,0.4l-0.8-0.1
-			c0.1-0.3,0.1-0.5,0.2-0.6c0.1-0.2,0.3-0.3,0.4-0.4s0.4-0.1,0.6-0.1c0.4,0,0.7,0.1,1,0.4c0.2,0.2,0.3,0.4,0.3,0.7
-			c0,0.4-0.2,0.7-0.6,0.9c0.2,0.1,0.4,0.2,0.6,0.4s0.2,0.4,0.2,0.7c0,0.4-0.1,0.7-0.4,1c-0.3,0.3-0.6,0.4-1,0.4
-			c-0.4,0-0.7-0.1-1-0.3S77.7,152.2,77.7,151.9z"/>
-                    <path class="st2" d="M82.4,148.7c0.4,0,0.7,0.1,1,0.4c0.3,0.3,0.4,0.9,0.4,1.7c0,0.8-0.1,1.4-0.4,1.7c-0.2,0.3-0.5,0.4-1,0.4
-			c-0.4,0-0.7-0.2-1-0.5s-0.4-0.9-0.4-1.7c0-0.8,0.1-1.4,0.4-1.7C81.6,148.9,82,148.7,82.4,148.7z M82.4,149.4c-0.1,0-0.2,0-0.3,0.1
-			s-0.1,0.2-0.2,0.3c-0.1,0.2-0.1,0.6-0.1,1.1s0,0.8,0.1,1c0,0.2,0.1,0.3,0.2,0.4s0.2,0.1,0.3,0.1c0.1,0,0.2,0,0.3-0.1
-			c0.1-0.1,0.1-0.2,0.2-0.3c0.1-0.2,0.1-0.6,0.1-1.1s0-0.8-0.1-1c0-0.2-0.1-0.3-0.2-0.4S82.5,149.4,82.4,149.4z"/>
-                    <path class="st2" d="M84.3,149.8c0-0.4,0.1-0.7,0.2-0.8s0.4-0.3,0.7-0.3c0.3,0,0.5,0.1,0.7,0.3s0.3,0.5,0.3,0.8
-			c0,0.4-0.1,0.7-0.3,0.8s-0.4,0.3-0.7,0.3c-0.3,0-0.5-0.1-0.7-0.3C84.4,150.4,84.3,150.2,84.3,149.8z M84.9,149.8
-			c0,0.3,0,0.5,0.1,0.6c0,0.1,0.1,0.1,0.2,0.1c0.1,0,0.2,0,0.2-0.1c0.1-0.1,0.1-0.3,0.1-0.6c0-0.3,0-0.5-0.1-0.6
-			c0-0.1-0.1-0.1-0.2-0.1c-0.1,0-0.2,0-0.2,0.1C85,149.3,84.9,149.5,84.9,149.8z M85.8,153.1h-0.6l2.3-4.5h0.6L85.8,153.1z
-			 M87.2,152c0-0.4,0.1-0.7,0.2-0.8s0.4-0.3,0.7-0.3c0.3,0,0.5,0.1,0.7,0.3s0.3,0.5,0.3,0.8c0,0.4-0.1,0.7-0.3,0.8s-0.4,0.3-0.7,0.3
-			c-0.3,0-0.5-0.1-0.7-0.3S87.2,152.4,87.2,152z M87.8,152c0,0.3,0,0.5,0.1,0.6c0,0.1,0.1,0.1,0.2,0.1c0.1,0,0.2,0,0.2-0.1
-			c0.1-0.1,0.1-0.3,0.1-0.6c0-0.3,0-0.5-0.1-0.6c0-0.1-0.1-0.1-0.2-0.1s-0.2,0-0.2,0.1C87.8,151.6,87.8,151.8,87.8,152z"/>
+		<path class="st6" d="M384.1,57.4v-11c0-0.7-1.7-1.3-3.7-1.3H377c-2,0-3.7,0.6-3.7,1.3v11H384.1z"/>
+                    <line class="st6" x1="378.9" y1="21.6" x2="378.9" y2="45"/>
 	</g>
-                <path class="st3" d="M94.6,168.2V69.5c0-6.6-5.8-12-13-12H69.4c-7.2,0-13,5.4-13,12v98.7H94.6z"/>
-                <line class="st3" x1="100.8" y1="168.2" x2="50.2" y2="168.2"/>
-                <g>
-		<rect x="66.4" y="168.2" class="st3" width="18" height="24.2"/>
-                    <line class="st3" x1="89.2" y1="192.4" x2="61.8" y2="192.4"/>
-	</g>
-                <g>
-		<path class="st4" d="M80.9,57.4v-11c0-0.7-1.7-1.3-3.7-1.3h-3.5c-2,0-3.7,0.6-3.7,1.3v11H80.9z"/>
-                    <line class="st4" x1="75.7" y1="21.6" x2="75.7" y2="45"/>
-	</g>
-                <line class="st5" x1="94.7" y1="98.1" x2="56.1" y2="98.1"/>
-                <line class="st5" x1="74.5" y1="81.7" x2="56.2" y2="81.7"/>
-                <line class="st5" x1="76.7" y1="115.4" x2="56.1" y2="115.4"/>
-                <line class="st5" x1="76.7" y1="132.4" x2="56.2" y2="132.4"/>
-                <line class="st5" x1="75" y1="151.4" x2="56.2" y2="151.4"/>
+                <line class="st7" x1="398" y1="98.1" x2="359.3" y2="98.1"/>
+                <line class="st7" x1="377.7" y1="81.7" x2="359.4" y2="81.7"/>
+                <line class="st7" x1="379.9" y1="115.4" x2="359.3" y2="115.4"/>
+                <line class="st7" x1="379.9" y1="132.4" x2="359.4" y2="132.4"/>
+                <line class="st7" x1="378.2" y1="151.4" x2="359.4" y2="151.4"/>
 </g>
+            <rect x="25.6" y="51.2" class="st8" width="316.9" height="132.3"/>
+            <text transform="matrix(1 0 0 1 25.6242 68.7027)"><tspan x="0" y="0" class="st2 st9 st10">Interventions trialled led to </tspan>
+                <tspan x="0" y="30.8" class="st2 st9 st10">an increase in childhood </tspan>
+                <tspan x="0" y="61.6" class="st2 st9 st10">immunisation coverage from</tspan>
+                <tspan x="306.2" y="61.6" class="st11 st9 st10"> </tspan>
+                <tspan x="0" y="92.4" class="st1 st3 st12">30%</tspan>
+                <tspan x="55.2" y="92.4" class="st9 st10"> </tspan>
+                <tspan x="62" y="92.4" class="st2 st9 st10">to </tspan>
+                <tspan id="percentIncrese" x="89.1" y="92.4" class="st0 st3 st12">83%</tspan>
+                <tspan x="144.3" y="92.4" class="st0 st9 st12"> </tspan></text>
 </svg>
     </div>
 
@@ -845,72 +1123,6 @@
             Pellentesque faucibus orci quis enim convallis ultricies. Vivamus a malesuada mi, sed blandit diam.
             Suspendisse lobortis finibus leo in tristique. Sed eu tortor lacus. Aliquam erat volutpat. Donec nisl justo,
             blandit at tellus quis, venenatis fringilla tortor. Suspendisse a ullamcorper nisi.<br><br>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-6">
-            <!-- This content will take up 3/12 (or 1/4) of the container -->
-            <div class="person-box">
-                <img src="assets/people/people_Awoonor-Williams.png">
-                <div class="name-and-title-box">
-                    <span class="name">Elisabeth</span>
-                    <div class="title">Community Health Volunteer</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-6">
-            <!-- This content will take up 3/12 (or 1/4) of the container -->
-            <div class="person-box">
-                <img src="assets/people/people_Awoonor-Williams.png">
-                <div class="name-and-title-box">
-                    <span class="name">Elisabeth</span>
-                    <div class="title">Community Health Volunteer</div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-6">
-            <!-- This content will take up 3/12 (or 1/4) of the container -->
-            <div class="person-box">
-                <img src="assets/people/people_Awoonor-Williams.png">
-                <div class="name-and-title-box">
-                    <span class="name">Elisabeth</span>
-                    <div class="title">Community Health Volunteer</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-6">
-            <!-- This content will take up 3/12 (or 1/4) of the container -->
-            <div class="person-box">
-                <img src="assets/people/people_Awoonor-Williams.png">
-                <div class="name-and-title-box">
-                    <span class="name">Elisabeth</span>
-                    <div class="title">Community Health Volunteer</div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-6">
-            <!-- This content will take up 3/12 (or 1/4) of the container -->
-            <div class="person-box">
-                <img src="assets/people/people_Awoonor-Williams.png">
-                <div class="name-and-title-box">
-                    <span class="name">Elisabeth</span>
-                    <div class="title">Community Health Volunteer</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-6">
-            <!-- This content will take up 3/12 (or 1/4) of the container -->
-            <div class="person-box">
-                <img src="assets/people/people_Awoonor-Williams.png">
-                <div class="name-and-title-box">
-                    <span class="name">Elisabeth</span>
-                    <div class="title">Community Health Volunteer</div>
-                </div>
-            </div>
         </div>
     </div>
 
