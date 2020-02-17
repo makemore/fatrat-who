@@ -1,3 +1,4 @@
+
 $(function () {
 
 
@@ -161,9 +162,58 @@ $(function () {
         element.animateFunction(0);
     });
 
+    var animations = [
+        {
+            selector: "#graph123",            
+            startingLeft: null,
+            startingWidth: null,
+            startingHeight: null
+        }
+    ];
+
+    
+    animations.forEach(function (element) {
+        //element.startingLeft = $(element.selector).css("left");
+        element.startingHeight = $(element.selector).height();
+        element.startingWidth = $(element.selector).width();
+
+        /*$(element.scrollingAreaSelector).css({
+            "height": element.scrollingAreaHeight,
+            "margin-bottom": "50px;"
+        })*/
+        //element.animateFunction(0);
+    });
+
     window.scrollingElements = scrollingElements;
 
     $(window).scroll(function () {
+        //this.console.log("scroll");
+        animations.forEach(function (element) {
+
+            var clientRect = document.querySelector(element.selector).getBoundingClientRect();
+            var innerHeight = window.innerHeight;
+            element.scrollingAreaHeight = $(element.selector).height();
+
+
+            //console.log(clientRect.y,-Math.abs(element.scrollingAreaHeight));
+            if (clientRect.y < 0) {
+                if (clientRect.y < -Math.abs(element.scrollingAreaHeight)) {
+                    console.log("after3", clientRect.y);
+                    //setElementAfterScrolling(element);
+                    //element.animateFunction(1);
+                } else {
+                    console.log("during2", clientRect.y);
+                    //setElementHoldingScrolling(element);
+                    //var percent = Math.abs(clientRect.y) / (element.scrollingAreaHeight - element.startingHeight);
+                    //element.animateFunction(percent);
+                }
+            }
+            if (clientRect.y > 0) {
+                console.log("before1", clientRect.y);
+                //setElementBeforeScroll(element);
+                //element.animateFunction(0);
+            }
+        });
 
 
         scrollingElements.forEach(function (element) {
@@ -188,8 +238,6 @@ $(function () {
                 setElementBeforeScroll(element);
                 element.animateFunction(0);
             }
-
-
         });
 
 
